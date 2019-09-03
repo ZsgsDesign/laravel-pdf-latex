@@ -1,11 +1,14 @@
 {
-    "name": "techsemicolon/laravel-php-latex",
+    "name": "zsgsdesign/laravel-php-latex",
     "description": "A latex package for laravel to generate pdfs",
     "license": "MIT",
     "authors": [
         {
             "name": "Mihir Bhende",
             "email": "techsemicolon@gmail.com"
+        },{
+            "name": "John Zhang",
+            "email": "zsgsdesign@gmail.com"
         }
     ],
     "minimum-stability": "dev",
