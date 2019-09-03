@@ -10,10 +10,10 @@ use Symfony\Component\Process\Process;
 
 class Latex
 {
-	/**
-	 * Stub view file path
-	 * @var string
-	 */
+    /**
+     * Stub view file path
+     * @var string
+     */
     private $stubPath;
 
     /**
@@ -131,9 +131,9 @@ class Latex
      */
     public function with($data){
 
-    	$this->data = $data;
+        $this->data = $data;
 
-    	return $this;
+        return $this;
     }
 
     /**
@@ -176,9 +176,9 @@ class Latex
             throw new ViewNotFoundException('View ' . $this->stubPath . ' not found.');
         }
 
-    	$this->renderedTex = view($this->stubPath, $this->data)->render();
+        $this->renderedTex = view($this->stubPath, $this->data)->render();
 
-    	return $this->renderedTex;
+        return $this->renderedTex;
     }
 
     /**
@@ -233,7 +233,7 @@ class Latex
      */
     private function generate(){
 
-    	$fileName = str_random(10);
+        $fileName = str_random(10);
         $tmpfname = tempnam(sys_get_temp_dir(), $fileName);
         $tmpDir = sys_get_temp_dir();
         chmod($tmpfname, 0755);
@@ -247,9 +247,9 @@ class Latex
         $process->run();
 
         if (!$process->isSuccessful()) {
-        	
+            
             \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
-        	$this->parseError($tmpfname, $process);
+            $this->parseError($tmpfname, $process);
         }
 
         $this->teardown($tmpfname);
@@ -295,14 +295,14 @@ class Latex
      */
     private function parseError($tmpfname, $process){
 
-    	$logFile = $tmpfname.'.log';
+        $logFile = $tmpfname.'.log';
 
-    	if(!\File::exists($logFile)){
+        if(!\File::exists($logFile)){
 
-    		throw new LatextException($process->getOutput());
-    	}
+            throw new LatextException($process->getOutput());
+        }
 
-    	$error = \File::get($tmpfname.'.log');
-    	throw new LatextException($error);
+        $error = \File::get($tmpfname.'.log');
+        throw new LatextException($error);
     }
 }
