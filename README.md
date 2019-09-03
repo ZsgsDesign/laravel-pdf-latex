@@ -135,7 +135,7 @@ Create a view files inside `resources/views/latex/tex.blade.php`
 \end{document}
 ~~~
 
-You can see how we have easily used blade directives for {{ $name }} or @foreach to show addresses in table to dynamically generate the content.
+You can see how we have easily used blade directives for `{{ $name }}` or `@foreach` to show addresses in table to dynamically generate the content.
 
 -  Generate the file : 
 
