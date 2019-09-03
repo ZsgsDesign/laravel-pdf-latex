@@ -1,6 +1,6 @@
 <?php
 
-namespace Techsemicolon;
+namespace ZsgsDesign\PDFConverter;
 
 class LatextEmptyCollectionException extends \Exception
 {

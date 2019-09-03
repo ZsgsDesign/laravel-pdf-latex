@@ -25,7 +25,7 @@ The different is :
 ## Installation : 
 
 ~~~bash
-composer require techsemicolon/laravel-php-latex
+composer require techsemicolon/laravel-pdf-latex
 ~~~
 
 ## Dry Run : 
@@ -38,7 +38,7 @@ Before diving into the usage directly, it is important to make sure required pro
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Techsemicolon\Latex;
+use ZsgsDesign\PDFConverter\Latex;
 
 class TestController extends Controller
 {
@@ -149,7 +149,7 @@ There are few actions you can choose take to generate.
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Techsemicolon\Latex;
+use ZsgsDesign\PDFConverter\Latex;
 
 class TestController extends Controller
 {
@@ -292,7 +292,7 @@ Then you can define a listener like :
 
 namespace App\Listeners;
 
-use Techsemicolon\LatexPdfWasGenerated;
+use ZsgsDesign\PDFConverter\LatexPdfWasGenerated;
 
 class LatexPdfWasGeneratedConfirmation
 {

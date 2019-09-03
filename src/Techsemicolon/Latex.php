@@ -1,11 +1,11 @@
 <?php
 
-namespace Techsemicolon;
+namespace ZsgsDesign\PDFConverter;
 
-use Techsemicolon\LatextException;
-use Techsemicolon\LatexPdfWasGenerated;
-use Techsemicolon\LatexPdfFailed;
-use Techsemicolon\ViewNotFoundException;
+use ZsgsDesign\PDFConverter\LatextException;
+use ZsgsDesign\PDFConverter\LatexPdfWasGenerated;
+use ZsgsDesign\PDFConverter\LatexPdfFailed;
+use ZsgsDesign\PDFConverter\ViewNotFoundException;
 use Symfony\Component\Process\Process;
 
 class Latex

@@ -1,5 +1,5 @@
 {
-    "name": "zsgsdesign/laravel-php-latex",
+    "name": "zsgsdesign/laravel-pdf-latex",
     "description": "A latex package for laravel to generate pdfs",
     "license": "MIT",
     "authors": [
@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Techsemicolon\\": "src/"
+            "ZsgsDesign\\PDFConverter\\": "src/"
         }
     }
 }

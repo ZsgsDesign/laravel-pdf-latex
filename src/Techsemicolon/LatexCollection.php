@@ -1,12 +1,12 @@
 <?php
 
-namespace Techsemicolon;
+namespace ZsgsDesign\PDFConverter;
 
 use Symfony\Component\Process\Process;
-use Techsemicolon\Latex;
-use Techsemicolon\LatextEmptyCollectionException;
-use Techsemicolon\LatextException;
-use Techsemicolon\LatextZipFailedException;
+use ZsgsDesign\PDFConverter\Latex;
+use ZsgsDesign\PDFConverter\LatextEmptyCollectionException;
+use ZsgsDesign\PDFConverter\LatextException;
+use ZsgsDesign\PDFConverter\LatextZipFailedException;
 
 class LatexCollection
 {
