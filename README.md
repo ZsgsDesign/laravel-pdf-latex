@@ -25,7 +25,7 @@ The different is :
 ## Installation : 
 
 ~~~bash
-composer require techsemicolon/laravel-pdf-latex
+composer require zsgsdesign/laravel-pdf-latex
 ~~~
 
 ## Dry Run : 
