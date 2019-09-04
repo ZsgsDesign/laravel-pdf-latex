@@ -18,14 +18,14 @@ class Latex
 
     /**
      * Data to pass to the stub
-     * 
+     *
      * @var array
      */
     private $data;
 
     /**
      * Rendered tex file
-     * 
+     *
      * @var string
      */
     private $renderedTex;
@@ -44,51 +44,59 @@ class Latex
 
     /**
      * Path of pdflatex
-     * 
+     *
      * @var string
      */
     private $binPath;
 
     /**
      * File Name inside Zip
-     * 
+     *
      * @var string
      */
     private $nameInsideZip;
 
     /**
      * Construct the instance
-     * 
+     *
      * @param string $stubPath
      * @param mixed $metadata
      */
-    public function __construct($stubPath = null, $metadata = null){
+    public function __construct($stubPath = null, $metadata = null)
+    {
+        if (!in_array(PHP_OS_FAMILY, ['Linux'])){
+            throw new LatextException("Unsupported Operating System");
+        }
 
-        if($stubPath instanceof RawTex){
+        $process = new Process("which pdflatex");
+        $process->run();
 
+        if (!$process->isSuccessful()) {
+            throw new LatextException($process->getOutput());
+        }
+
+        $this->binPath = $process->getOutput();
+        
+        if ($stubPath instanceof RawTex) {
             $this->isRaw = true;
             $this->renderedTex = $stubPath->getTex();
-        }
-        else{
-
-           $this->stubPath = $stubPath;
+        } else {
+            $this->stubPath = $stubPath;
         }
         
         $this->metadata = $metadata;
-
     }
 
     /**
      * Set the path of pdflatex
-     * 
+     *
      * @param  string $binPath
-     * 
+     *
      * @return void
      */
-    public function binPath($binPath){
-
-        if(is_string($binPath)){
-
+    public function binPath($binPath)
+    {
+        if (is_string($binPath)) {
             $this->binPath = $binPath;
         }
 
@@ -97,15 +105,14 @@ class Latex
 
     /**
      * Set name inside zip file
-     * 
+     *
      * @param  string $nameInsideZip
-     * 
+     *
      * @return void
      */
-    public function setName($nameInsideZip){
-
-        if(is_string($nameInsideZip)){
-
+    public function setName($nameInsideZip)
+    {
+        if (is_string($nameInsideZip)) {
             $this->nameInsideZip = basename($nameInsideZip);
         }
 
@@ -114,23 +121,23 @@ class Latex
 
     /**
      * Get name inside zip file
-     * 
+     *
      * @return string
      */
-    public function getName(){
-
+    public function getName()
+    {
         return $this->nameInsideZip;
     }
 
     /**
      * Set the with data
-     * 
+     *
      * @param  array $data
-     * 
+     *
      * @return void
      */
-    public function with($data){
-
+    public function with($data)
+    {
         $this->data = $data;
 
         return $this;
@@ -138,20 +145,12 @@ class Latex
 
     /**
      * Dry run
-     * 
+     *
      * @return Illuminate\Http\Response
      */
-    public function dryRun(){
-
+    public function dryRun()
+    {
         $this->isRaw = true;
-
-        $process = new Process("which pdflatex");
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            
-            throw new LatextException($process->getOutput());
-        }
 
         $this->renderedTex = \File::get(dirname(__FILE__).'/dryrun.tex');
         
@@ -160,19 +159,17 @@ class Latex
 
     /**
      * Render the stub with data
-     * 
+     *
      * @return string
      * @throws ViewNotFoundException
      */
-    public function render(){
-
-        if($this->renderedTex){
-            
-           return $this->renderedTex;
+    public function render()
+    {
+        if ($this->renderedTex) {
+            return $this->renderedTex;
         }
 
-        if(!view()->exists($this->stubPath)){
-            
+        if (!view()->exists($this->stubPath)) {
             throw new ViewNotFoundException('View ' . $this->stubPath . ' not found.');
         }
 
@@ -183,9 +180,9 @@ class Latex
 
     /**
      * Save generated PDF
-     * 
+     *
      * @param  string $location
-     * 
+     *
      * @return boolean
      */
     public function savePdf($location)
@@ -209,13 +206,13 @@ class Latex
      */
     public function download($fileName = null)
     {
-        if(!$this->isRaw){
-           $this->render();
+        if (!$this->isRaw) {
+            $this->render();
         }
 
         $pdfPath = $this->generate();
 
-        if(!$fileName){
+        if (!$fileName) {
             $fileName = basename($pdfPath);
         }
 
@@ -228,11 +225,11 @@ class Latex
 
     /**
      * Generate the PDF
-     * 
+     *
      * @return string
      */
-    private function generate(){
-
+    private function generate()
+    {
         $fileName = str_random(10);
         $tmpfname = tempnam(sys_get_temp_dir(), $fileName);
         $tmpDir = sys_get_temp_dir();
@@ -247,7 +244,6 @@ class Latex
         $process->run();
 
         if (!$process->isSuccessful()) {
-            
             \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
             $this->parseError($tmpfname, $process);
         }
@@ -255,8 +251,7 @@ class Latex
         $this->teardown($tmpfname);
 
         register_shutdown_function(function () use ($tmpfname) {
-
-            if(\File::exists($tmpfname . '.pdf')){
+            if (\File::exists($tmpfname . '.pdf')) {
                 \File::delete($tmpfname . '.pdf');
             }
         });
@@ -266,20 +261,20 @@ class Latex
 
     /**
      * Teardown secondary files
-     * 
+     *
      * @param  string $tmpfname
-     * 
+     *
      * @return void
      */
     private function teardown($tmpfname)
     {
-        if(\File::exists($tmpfname)){
+        if (\File::exists($tmpfname)) {
             \File::delete($tmpfname);
         }
-        if(\File::exists($tmpfname . '.aux')){
+        if (\File::exists($tmpfname . '.aux')) {
             \File::delete($tmpfname . '.aux');
         }
-        if(\File::exists($tmpfname . '.log')){
+        if (\File::exists($tmpfname . '.log')) {
             \File::delete($tmpfname . '.log');
         }
 
@@ -288,17 +283,16 @@ class Latex
 
     /**
      * Throw error from log gile
-     * 
+     *
      * @param  string $tmpfname
-     * 
+     *
      * @throws \LatextException
      */
-    private function parseError($tmpfname, $process){
-
+    private function parseError($tmpfname, $process)
+    {
         $logFile = $tmpfname.'.log';
 
-        if(!\File::exists($logFile)){
-
+        if (!\File::exists($logFile)) {
             throw new LatextException($process->getOutput());
         }
 
