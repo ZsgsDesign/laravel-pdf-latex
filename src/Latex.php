@@ -75,7 +75,7 @@ class Latex
             throw new LatextException($process->getOutput());
         }
 
-        $this->binPath = $process->getOutput();
+        $this->binPath = trim($process->getOutput());
         
         if ($stubPath instanceof RawTex) {
             $this->isRaw = true;
