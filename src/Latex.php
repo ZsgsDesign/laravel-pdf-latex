@@ -7,6 +7,7 @@ use ZsgsDesign\PDFConverter\LatexPdfWasGenerated;
 use ZsgsDesign\PDFConverter\LatexPdfFailed;
 use ZsgsDesign\PDFConverter\ViewNotFoundException;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Str;
 
 class Latex
 {
@@ -230,7 +231,7 @@ class Latex
      */
     private function generate()
     {
-        $fileName = str_random(10);
+        $fileName = Str::random(10);
         $tmpfname = tempnam(sys_get_temp_dir(), $fileName);
         $tmpDir = sys_get_temp_dir();
         chmod($tmpfname, 0755);
