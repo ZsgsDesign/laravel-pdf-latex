@@ -63,13 +63,13 @@ class Latex
      * @param string $stubPath
      * @param mixed $metadata
      */
-    public function __construct($stubPath = null, $metadata = null)
+    public function __construct($stubPath = null, $metadata = null, $pdflatexPath = 'pdflatex')
     {
         if (!in_array(PHP_OS_FAMILY, ['Linux'])){
             throw new LatextException("Unsupported Operating System");
         }
 
-        $process = new Process("which pdflatex");
+        $process = new Process("which " . $pdflatexPath);
         $process->run();
 
         if (!$process->isSuccessful()) {
