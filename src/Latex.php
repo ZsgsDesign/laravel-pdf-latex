@@ -69,21 +69,10 @@ class Latex
      * @param string $stubPath
      * @param mixed $metadata
      */
-    public function __construct($stubPath = null, $metadata = null, $pdflatexPath = 'pdflatex')
+    public function __construct($stubPath = null, $metadata = null, $latexBinary = 'pdflatex')
     {
-        if (!in_array(PHP_OS_FAMILY, ['Linux'])){
-            throw new LatextException("Unsupported Operating System");
-        }
-
-        $process = new Process("which " . $pdflatexPath);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new LatextException($process->getOutput());
-        }
-
-        $this->binPath = trim($process->getOutput());
-
+        $this->binPath = $latexBinary;
+        
         if ($stubPath instanceof RawTex) {
             $this->isRaw = true;
             $this->renderedTex = $stubPath->getTex();
