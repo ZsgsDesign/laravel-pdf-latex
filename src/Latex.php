@@ -58,6 +58,12 @@ class Latex
     private $nameInsideZip;
 
     /**
+     * If it's a raw tex or a view file
+     * @var boolean
+     */
+    private $runUntilAuxSettles = false;
+
+    /**
      * Construct the instance
      *
      * @param string $stubPath
@@ -129,6 +135,18 @@ class Latex
     public function with($data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set whether we run latex until the aux file settles down
+     *
+     * @return $this
+     */
+    public function untilAuxSettles()
+    {
+        $this->runUntilAuxSettles = true;
 
         return $this;
     }
@@ -224,19 +242,29 @@ class Latex
         $tmpfname = tempnam(sys_get_temp_dir(), $fileName);
         $tmpDir = sys_get_temp_dir();
         chmod($tmpfname, 0755);
+        
+        $auxFileName = $tmpDir . '/' . \File::name($tmpfname) . '.aux';
+        $lastAuxHash = null;
+        $auxHash = null;
 
         \File::put($tmpfname, $this->renderedTex);
-
         $program    = $this->binPath ? $this->binPath : 'pdflatex';
         $cmd        = "$program -output-directory $tmpDir $tmpfname";
         
-        $process    = new Process($cmd);
-        $process->run();
+        do {
+            $lastAuxHash = $auxHash;
+            $process    = new Process($cmd);
+            $process->run();
 
-        if (!$process->isSuccessful()) {
-            \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
-            $this->parseError($tmpfname, $process);
-        }
+            if (!$process->isSuccessful()) {
+                \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
+                $this->parseError($tmpfname, $process);
+            }
+
+            if (\File::exists($auxFileName)) {
+                $auxHash = \File::hash($auxFileName);
+            }
+        } while ($this->runUntilAuxSettles && ($lastAuxHash != $auxHash));
 
         $this->teardown($tmpfname);
 
