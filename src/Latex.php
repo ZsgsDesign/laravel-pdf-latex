@@ -22,7 +22,7 @@ class Latex
      *
      * @var array
      */
-    private $data;
+    private $data = [];
 
     /**
      * Rendered tex file
@@ -41,7 +41,7 @@ class Latex
      * Metadata of the generated pdf
      * @var mixed
      */
-    private $metadata;
+    private $metadata = [];
 
     /**
      * Path of pdflatex
@@ -69,18 +69,9 @@ class Latex
      * @param string $stubPath
      * @param mixed $metadata
      */
-    public function __construct($stubPath = null, $metadata = null, $latexBinary = 'pdflatex')
+    public function __construct($latexBinary = 'pdflatex')
     {
         $this->binPath = $latexBinary;
-        
-        if ($stubPath instanceof RawTex) {
-            $this->isRaw = true;
-            $this->renderedTex = $stubPath->getTex();
-        } else {
-            $this->stubPath = $stubPath;
-        }
-        
-        $this->metadata = $metadata;
     }
 
     /**
@@ -95,6 +86,26 @@ class Latex
         if (is_string($binPath)) {
             $this->binPath = $binPath;
         }
+
+        return $this;
+    }
+
+    /**
+     * Set the view to render
+     *
+     * @param  string $tag
+     *
+     * @return this
+     */
+    public function view($tag, $data = [])
+    {
+        if ($tag instanceof RawTex) {
+            $this->isRaw = true;
+            $this->renderedTex = $tag->getTex();
+        } else {
+            $this->stubPath = $tag;
+        }
+        $this->data = $data;
 
         return $this;
     }
@@ -123,20 +134,6 @@ class Latex
     public function getName()
     {
         return $this->nameInsideZip;
-    }
-
-    /**
-     * Set the with data
-     *
-     * @param  array $data
-     *
-     * @return void
-     */
-    public function with($data)
-    {
-        $this->data = $data;
-
-        return $this;
     }
 
     /**
@@ -193,11 +190,11 @@ class Latex
      *
      * @return boolean
      */
-    public function savePdf($location)
+    public function savePdf($location, $callback = null)
     {
         $this->render();
 
-        $pdfPath = $this->generate();
+        $pdfPath = $this->generate($callback);
 
         $fileMoved = \File::move($pdfPath, $location);
 
@@ -212,13 +209,13 @@ class Latex
      * @param  string|null $fileName
      * @return Illuminate\Http\Response
      */
-    public function download($fileName = null)
+    public function download($fileName = null, $callback = null)
     {
         if (!$this->isRaw) {
             $this->render();
         }
 
-        $pdfPath = $this->generate();
+        $pdfPath = $this->generate($callback);
 
         if (!$fileName) {
             $fileName = basename($pdfPath);
@@ -231,18 +228,36 @@ class Latex
         ]);
     }
 
+    public function file($callback = null) {
+        if (!$this->isRaw) {
+            $this->render();
+        }
+
+        $pdfPath = $this->generate($callback);
+
+        \Event::dispatch(new LatexPdfWasGenerated($pdfPath, 'file', $this->metadata));
+
+        return \Response::file($pdfPath, [
+              'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     /**
      * Generate the PDF
      *
      * @return string
      */
-    private function generate()
+    private function generate($callback = null)
     {
         $fileName = Str::random(10);
         $tmpfname = tempnam(sys_get_temp_dir(), $fileName);
         $tmpDir = sys_get_temp_dir();
         chmod($tmpfname, 0755);
         
+        if ($callback) {
+            $callback($tmpDir, $fileName);
+        }
+
         $auxFileName = $tmpDir . '/' . \File::name($tmpfname) . '.aux';
         $lastAuxHash = null;
         $auxHash = null;
