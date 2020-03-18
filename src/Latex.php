@@ -268,7 +268,7 @@ class Latex
         
         do {
             $lastAuxHash = $auxHash;
-            $process    = new Process($cmd);
+            $process    = new Process($cmd, $tmpDir);
             $process->run();
 
             if (!$process->isSuccessful()) {
