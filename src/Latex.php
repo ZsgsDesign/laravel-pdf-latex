@@ -69,7 +69,7 @@ class Latex
             throw new LatextException("Unsupported Operating System");
         }
 
-        $process = new Process(array("which " . $pdflatexPath));
+        $process = new Process("which " . $pdflatexPath);
         $process->run();
 
         if (!$process->isSuccessful()) {
