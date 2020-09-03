@@ -241,7 +241,7 @@ class Latex
         $program    = $this->binPath ? $this->binPath : 'pdflatex';
         $cmd        = "$program -output-directory $tmpDir $tmpfname";
         
-        $process    = new Process($cmd);
+        $process    = new Process(array($cmd));
         $process->run();
 
         if (!$process->isSuccessful()) {
