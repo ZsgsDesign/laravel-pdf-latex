@@ -69,12 +69,12 @@ class Latex
             throw new LatextException("Unsupported Operating System");
         }
 
-        $process = new Process("which " . $pdflatexPath);
+        $process = new Process(array("which " . $pdflatexPath));
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            throw new LatextException($process->getOutput());
-        }
+        //if (!$process->isSuccessful()) {
+        //    throw new LatextException($process->getOutput());
+        //}
 
         $this->binPath = trim($process->getOutput());
         
@@ -241,13 +241,13 @@ class Latex
         $program    = $this->binPath ? $this->binPath : 'pdflatex';
         $cmd        = "$program -output-directory $tmpDir $tmpfname";
         
-        $process    = new Process($cmd);
+        $process    = new Process(array($cmd));
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
-            $this->parseError($tmpfname, $process);
-        }
+        //if (!$process->isSuccessful()) {
+        //    \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
+          //  $this->parseError($tmpfname, $process);
+        //}
 
         $this->teardown($tmpfname);
 
