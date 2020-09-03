@@ -244,10 +244,10 @@ class Latex
         $process    = new Process(array($cmd));
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
-            $this->parseError($tmpfname, $process);
-        }
+        //if (!$process->isSuccessful()) {
+        //    \Event::dispatch(new LatexPdfFailed($fileName, 'download', $this->metadata));
+          //  $this->parseError($tmpfname, $process);
+        //}
 
         $this->teardown($tmpfname);
 
