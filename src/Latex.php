@@ -264,11 +264,10 @@ class Latex
 
         \File::put($tmpfname, $this->renderedTex);
         $program    = $this->binPath ? $this->binPath : 'pdflatex';
-        $cmd        = "$program -output-directory $tmpDir $tmpfname";
         
         do {
             $lastAuxHash = $auxHash;
-            $process    = new Process($cmd, $tmpDir);
+            $process    = new Process([$program, '-output-directory', $tmpDir, $tmpfname], $tmpDir);
             $process->run();
 
             if (!$process->isSuccessful()) {
