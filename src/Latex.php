@@ -58,7 +58,13 @@ class Latex
     private $nameInsideZip;
 
     /**
-     * If it's a raw tex or a view file
+     * Run in non-stop interaction mode
+     * @var boolean
+     */
+    private $runNonStop = false;
+
+    /**
+     * Run until the .aux file stops changing
      * @var boolean
      */
     private $runUntilAuxSettles = false;
@@ -134,6 +140,18 @@ class Latex
     public function getName()
     {
         return $this->nameInsideZip;
+    }
+
+    /**
+     * Set whether we run latex in non-stop interaction mode
+     *
+     * @return $this
+     */
+    public function nonStop()
+    {
+        $this->runNonStop = true;
+
+        return $this;
     }
 
     /**
@@ -264,10 +282,18 @@ class Latex
 
         \File::put($tmpfname, $this->renderedTex);
         $program    = $this->binPath ? $this->binPath : 'pdflatex';
+        $args = [$program];
+        if ($this->runNonStop) {
+            $args[] = '-interaction=nonstopmode';
+        }
+        $args = array_merge(
+            $args,
+            ['-output-directory', $tmpDir, $tmpfname]
+        );
         
         do {
             $lastAuxHash = $auxHash;
-            $process    = new Process([$program, '-output-directory', $tmpDir, $tmpfname], $tmpDir);
+            $process    = new Process($args, $tmpDir);
             $process->run();
 
             if (!$process->isSuccessful()) {
